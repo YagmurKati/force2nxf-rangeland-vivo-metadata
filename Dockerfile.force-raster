@@ -1,0 +1,25 @@
+FROM davidfrantz/force:dev
+
+RUN mkdir -p /var/cache/apt/archives/partial && \
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      coreutils procps \
+      r-cran-raster r-cran-terra r-cran-sp r-cran-rcpp && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN cat > /usr/local/bin/date <<'SH'
+#!/bin/sh
+if [ "$1" = "+%s%3N" ]; then
+  sec=$(/bin/date +%s)
+  ns=$(/bin/date +%N)
+  ms=$(printf "%s" "$ns" | cut -c1-3)
+  printf "%s%s\n" "$sec" "$ms"
+else
+  exec /bin/date "$@"
+fi
+SH
+
+RUN chmod +x /usr/local/bin/date && \
+    ts="$(date +%s%3N)" && echo "$ts" && test "${#ts}" = "13"
+
+RUN Rscript -e 'library(raster); library(terra); library(sp); library(Rcpp); print("OK")'

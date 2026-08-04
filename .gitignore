@@ -1,0 +1,19 @@
+.DS_Store
+__pycache__/
+*.pyc
+.env
+
+# Local Kubernetes credentials and private network config
+config.yml
+*.kubeconfig
+wg0.conf
+
+# Generated workflow/VIVO outputs
+metadata/*.ttl
+metadata/*.json
+metadata/VIVO_UPLOAD_FILES.txt
+!metadata/.gitkeep
+
+# Local logs
+*.log
+nohup.out

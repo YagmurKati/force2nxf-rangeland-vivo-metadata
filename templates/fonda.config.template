@@ -1,0 +1,28 @@
+process {
+  executor = "k8s"
+  scratch = true
+  errorStrategy = "retry"
+  maxRetries = __MAX_RETRIES__
+  pod = [
+    [volumeClaim: "__DATA_PVC__", mountPath: "/shared", readOnly: true]
+  ]
+
+  withName: /.*merge(BOA|QAI).*/ {
+    container = "__FORCE_IMAGE__"
+  }
+}
+
+k8s {
+  debug.yaml = true
+  namespace = "__NAMESPACE__"
+  serviceAccount = "__SERVICE_ACCOUNT__"
+  storageClaimName = "__WORK_PVC__"
+  storageMountPath = "/workspace"
+  workDir = "__WORK_ROOT__/work"
+  launchDir = "__WORK_ROOT__/launch"
+  projectDir = "__WORK_ROOT__/projects"
+  imagePullPolicy = "IfNotPresent"
+  runAsUser = 0
+}
+
+params.useCPU = __USE_CPU__
