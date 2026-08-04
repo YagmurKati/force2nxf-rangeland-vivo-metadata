@@ -1,0 +1,50 @@
+cff-version: 1.2.0
+message: "If you use this repository to collect VIVO metadata, cite this helper repository. If you run or cite the FORCE2NXF-Rangeland workflow or its scientific results, cite the upstream workflow and publication listed in the references."
+title: "FORCE2NXF-Rangeland VIVO Metadata"
+type: software
+authors:
+  - family-names: Kati
+    given-names: Yagmur
+repository-code: "https://github.com/YagmurKati/force2nxf-rangeland-vivo-metadata"
+url: "https://github.com/YagmurKati/force2nxf-rangeland-vivo-metadata"
+date-released: 2026-08-04
+license: MIT
+abstract: "Helper scripts and documentation for running FORCE2NXF-Rangeland on Kubernetes and collecting Nextflow, Kubernetes, Prometheus, energy, and carbon metadata as VIVO-ready Turtle."
+keywords:
+  - VIVO
+  - metadata
+  - provenance
+  - Nextflow
+  - Kubernetes
+  - FORCE
+  - Earth observation
+references:
+  - type: software
+    title: "FORCE2NXF-Rangeland"
+    authors:
+      - name: "CRC-FONDA"
+    repository-code: "https://github.com/CRC-FONDA/FORCE2NXF-Rangeland"
+    url: "https://github.com/CRC-FONDA/FORCE2NXF-Rangeland"
+  - type: conference-paper
+    title: "FORCE on Nextflow: Scalable Analysis of Earth Observation Data on Commodity Clusters"
+    authors:
+      - family-names: Lehmann
+        given-names: Fabian
+      - family-names: Frantz
+        given-names: David
+      - family-names: Becker
+        given-names: Soren
+      - family-names: Leser
+        given-names: Ulf
+      - family-names: Hostert
+        given-names: Patrick
+    year: 2021
+    conference:
+      name: "1st Workshop on Complex Data Challenges in Earth Observation"
+      date-start: 2021-11-01
+      location: "Virtual Event, QLD, Australia"
+    collection-title: "Proceedings of the CIKM 2021 Workshops"
+    collection-type: proceedings
+    publisher:
+      name: "CEUR-WS.org"
+    url: "https://ceur-ws.org/Vol-3052/short12.pdf"

@@ -2,6 +2,14 @@
 
 Run `CRC-FONDA/FORCE2NXF-Rangeland` on the FONDA Kubernetes cluster, collect execution metadata, and produce a Turtle (`.ttl`) file for VIVO.
 
+This repository does not redistribute `FORCE2NXF-Rangeland`. It provides helper scripts and documentation for the VIVO metadata collection layer. For the workflow itself, use the upstream repository:
+
+```text
+https://github.com/CRC-FONDA/FORCE2NXF-Rangeland
+```
+
+If you use the workflow or its scientific method, cite the upstream workflow and publication. If you use these helper scripts to produce VIVO metadata, cite this repository. See `CITATION.cff` and `CITATIONS.md`.
+
 ## Files
 
 - `Dockerfile.force-raster`: FORCE image with R packages needed by merge steps.
@@ -11,6 +19,8 @@ Run `CRC-FONDA/FORCE2NXF-Rangeland` on the FONDA Kubernetes cluster, collect exe
 - `scripts/collect_vivo_ttl.sh`: collects Nextflow, Kubernetes, Prometheus, energy, carbon, and code metadata.
 - `scripts/collect_force_workflow_run_only_metadata.py`: TTL collector.
 - `examples/env.example`: environment variables to edit.
+- `CITATION.cff`: machine-readable citation file.
+- `CITATIONS.md`: human-readable citation guidance.
 
 ## Requirements
 
