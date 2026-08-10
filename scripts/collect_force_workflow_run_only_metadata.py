@@ -1371,6 +1371,24 @@ def sha256_source(path: Path) -> str:
     return digest.hexdigest()
 
 
+def commit_url(repo_url: Optional[str], commit: Optional[str]) -> Optional[str]:
+    """Build a clickable commit URL from a repo URL and a commit SHA.
+
+    Supports GitHub and GitLab layouts. Returns None if either input is
+    missing or the host is unknown, so nothing bogus is emitted.
+    """
+    if not repo_url or not commit:
+        return None
+    url = repo_url.strip().rstrip("/")
+    if url.endswith(".git"):
+        url = url[: -len(".git")]
+    if "github.com" in url:
+        return f"{url}/commit/{commit}"
+    if "gitlab" in url:
+        return f"{url}/-/commit/{commit}"
+    return None
+
+
 def git_metadata(code_path: Path) -> Tuple[Optional[str], Optional[bool]]:
     cwd = code_path if code_path.is_dir() else code_path.parent
     try:
@@ -1670,13 +1688,9 @@ def append_metric_predicates(
         predicates.append(
             ("rm:carbonEmissionKgCO2e", ttl_literal(summary["carbon_kg"]))
         )
-    predicates.append(
-        (
-            "rm:carbonIntensityKgCO2ePerKWh",
-            ttl_literal(carbon_info.kg_per_kwh),
-        )
-    )
-    # Keep the established VIVO display predicate alongside the general one.
+    # rm:carbonIntensityKgCO2ePerKWh dropped 2026-08-10: identical value to
+    # rm:carbonIntensityAssumptionKgCO2ePerKWh below, and never declared in
+    # VIVO. The Assumption predicate is the one that displays.
     predicates.append(
         (
             "rm:carbonIntensityAssumptionKgCO2ePerKWh",
@@ -2229,8 +2243,14 @@ def build_ttl(
         )
     if git_commit:
         run_predicates.append(("rm:gitCommit", ttl_literal(git_commit)))
-    if git_dirty is not None:
-        run_predicates.append(("rm:codeModified", ttl_literal(git_dirty)))
+        # A bare SHA is only findable if the reader knows the repository, so
+        # emit the full clickable commit URL as well.
+        commit_link = commit_url(args.workflow_repo_url, git_commit)
+        if commit_link:
+            run_predicates.append(
+                ("rm:codeCommitLink", ttl_literal(commit_link, "xsd:anyURI"))
+            )
+    # rm:codeModified dropped 2026-08-10 (property removed from VIVO).
 
     append_metric_predicates(
         run_predicates,
@@ -2242,12 +2262,9 @@ def build_ttl(
     for image in images:
         run_predicates.append(("rm:containerImage", ttl_literal(image)))
     for node_name in node_names:
-        run_predicates.extend(
-            [
-                ("rm:executionHost", ttl_literal(node_name)),
-                ("rm:nodeName", ttl_literal(node_name)),
-            ]
-        )
+        # rm:nodeName dropped 2026-08-10: duplicated rm:executionHost
+        # value-for-value and was never declared in VIVO.
+        run_predicates.append(("rm:executionHost", ttl_literal(node_name)))
 
     for node in node_infos:
         node_info = node["node_info"]
@@ -2276,11 +2293,11 @@ def build_ttl(
                     (predicate, ttl_literal(node_info[key]))
                 )
 
+    # rm:gpuMetricsAvailable / rm:gpuCapableNodeUsed dropped 2026-08-10:
+    # collector diagnostics, never declared in VIVO.
     run_predicates.extend(
         [
             ("rm:gpuRequested", ttl_literal(False)),
-            ("rm:gpuMetricsAvailable", ttl_literal(False)),
-            ("rm:gpuCapableNodeUsed", ttl_literal(False)),
             ("rm:gpuUsageStatus", ttl_literal("CPU-only workflow run")),
         ]
     )
@@ -2656,6 +2673,15 @@ def build_args() -> argparse.Namespace:
         help="FORCE workflow code path inside the driver pod for code hashing.",
     )
     parser.add_argument("--code-uri", default=DEFAULT_CODE_URI)
+    parser.add_argument(
+        "--workflow-repo-url",
+        default=DEFAULT_CODE_URI,
+        help=(
+            "Repository the workflow source belongs to; combined with the git "
+            "commit to emit rm:codeCommitLink. Defaults to the workflow code "
+            "URI. Pass an empty string to omit."
+        ),
+    )
     parser.add_argument("--trace-archive", default=DEFAULT_TRACE_ARCHIVE)
     parser.add_argument("--trace-types", default=DEFAULT_TRACE_TYPES)
     parser.add_argument("--trace-data-format", default=DEFAULT_TRACE_DATA_FORMAT)
