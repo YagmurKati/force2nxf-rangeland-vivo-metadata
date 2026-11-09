@@ -609,7 +609,7 @@ def resolve_carbon_intensity(
             f"{args.electricity_maps_api_token_env} is empty."
         )
 
-    step_seconds = 300
+    step_seconds = 900
     start_epoch = int(start.astimezone(timezone.utc).timestamp())
     end_epoch = int(end.astimezone(timezone.utc).timestamp())
     query_start_epoch = (start_epoch // step_seconds) * step_seconds
@@ -626,7 +626,7 @@ def resolve_carbon_intensity(
         "start": api_datetime(query_start),
         "end": api_datetime(query_end),
         "emissionFactorType": "lifecycle",
-        "temporalGranularity": "5_minutes",
+        "temporalGranularity": "15_minutes",
         "flowTraced": "true",
         "disableEstimations": (
             "true"
@@ -643,6 +643,13 @@ def resolve_carbon_intensity(
     values: List[float] = []
     includes_estimates = False
     for point in points:
+        # Only the quarter-hours the run used (an answer may include the end point).
+        try:
+            point_start = parse_api_datetime(str(point.get("datetime")))
+        except (TypeError, ValueError):
+            continue
+        if not query_start <= point_start < query_end:
+            continue
         raw_value = point.get("value", point.get("carbonIntensity"))
         try:
             value = float(raw_value)
@@ -669,8 +676,8 @@ def resolve_carbon_intensity(
     return CarbonIntensityInfo(
         kg_per_kwh=average_g_per_kwh / 1000.0,
         source=(
-            "Electricity Maps historical flow-traced lifecycle carbon "
-            "intensity"
+            "Electricity Maps 15-minute history (zone "
+            f"{args.electricity_maps_zone}, lifecycle, flow-traced)"
         ),
         source_uri=args.electricity_maps_api_url,
         zone=args.electricity_maps_zone,
@@ -679,7 +686,7 @@ def resolve_carbon_intensity(
         start=api_datetime(query_start),
         end=api_datetime(query_end),
         emissions_basis="lifecycle CO2e",
-        temporal_granularity="5 minutes",
+        temporal_granularity="15 minutes",
     )
 
 
