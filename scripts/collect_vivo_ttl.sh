@@ -24,7 +24,7 @@ ARGS=(
   --console-log-remote "$RESULTS_DIR/nextflow-$RUN_LABEL.log"
   --debug-log-remote "$WF_DIR/.nextflow.log"
   --prom-url "$PROM_URL"
-  --carbon-intensity-source "${CARBON_INTENSITY_SOURCE:-co2map}"
+  --carbon-intensity-source "${CARBON_INTENSITY_SOURCE:-electricity-maps}"
   --co2map-data-status "${CO2MAP_DATA_STATUS:-preliminary}"
   --existing-workflow-run-only
   --output-file "$OUTPUT_TTL"

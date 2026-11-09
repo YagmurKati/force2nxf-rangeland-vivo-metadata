@@ -171,8 +171,14 @@ In the first terminal:
 
 ```bash
 source .env
+export ELECTRICITY_MAPS_API_TOKEN="$(kubectl -n "$NS" get secret electricity-maps-api-token -o jsonpath='{.data.token}' | base64 --decode)"
 scripts/collect_vivo_ttl.sh
+unset ELECTRICITY_MAPS_API_TOKEN
 ```
+
+Carbon uses the 15-minute grid carbon intensity of Electricity Maps (zone DE, lifecycle, flow-traced) for the
+quarter-hours of the run. Without a token the collection stops. CO2Map.de (hourly, direct CO2 only) is used only
+when you set `CARBON_INTENSITY_SOURCE=co2map`. Its values are not comparable with the other runs in VIVO.
 
 Outputs:
 
