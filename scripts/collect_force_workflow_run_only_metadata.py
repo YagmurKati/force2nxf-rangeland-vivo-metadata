@@ -2237,7 +2237,7 @@ def build_ttl(
     if log_metadata.get("nextflow_version"):
         run_predicates.append(
             (
-                "rm:nextflowVersion",
+                "rm:workflowEngineVersion",
                 ttl_literal(log_metadata["nextflow_version"]),
             )
         )
