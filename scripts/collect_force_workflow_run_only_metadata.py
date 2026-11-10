@@ -2314,11 +2314,18 @@ def build_ttl(
         )
     add_resource(lines, ttl_uri(run_uri), run_predicates)
 
+    # A publication links to the workflow, not to the run: rm:hasWorkflowRun is the
+    # inverse of rm:workflow, so a publication holding a run would become that run's workflow.
     if publication_uri:
         add_resource(
             lines,
             ttl_uri(publication_uri),
-            [("rm:hasWorkflowRun", ttl_uri(run_uri))],
+            [("rm:usesWorkflow", ttl_uri(workflow_uri))],
+        )
+        add_resource(
+            lines,
+            ttl_uri(workflow_uri),
+            [("rm:usedInPublication", ttl_uri(publication_uri))],
         )
 
     add_resource(
